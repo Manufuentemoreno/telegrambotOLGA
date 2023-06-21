@@ -6,7 +6,7 @@ class peticion :
     mensaje = ""
     bloque = False
     drive = True
-    rta = True
+    rta = False
 
 def respuestas(input_text: str) -> object:
     indicacion = str(input_text).lower()
@@ -23,11 +23,17 @@ def respuestas(input_text: str) -> object:
 
     # BLOQUE ENTERO
     if any([palabra in indicacion for palabra in bloqueEntero]):
-        response.mensaje = f"Pedido Bloque Entero cargado en Drive - {data_momento}"
+        # response.mensaje = f"Pedido Bloque Entero cargado en Drive - {data_momento}"
         response.bloque = True
         return response
 
 
     # CORTE DE MOMENTO
-    response.mensaje = f"Pedido Corte cargado en Drive - {data_momento}"
+    # response.mensaje = f"Pedido Corte cargado en Drive - {data_momento}"
+    return response
+
+# Agrega data a algo ya enviado antes
+def actualiza():
+    response = peticion()
+    # response.mensaje = "Ok. Actualizado"
     return response

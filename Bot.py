@@ -8,12 +8,8 @@ import Responses as resp
 import driveExcel as drive
 
 # ***************************** COMANDOS ***************************** 
-async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Bueno, todo listo. Arranquemo’")
-
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Mandá el mensaje todo junto. Si es Bloque Entero, aclará y todo piola. Por el link del drive, escribime ‘drive’")
-
+async def link_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Link: https://docs.google.com/spreadsheets/d/1gR9xNEhYWcS2XqRWDOdAi2a6AvVTaM7pHbGh49WSy8w/edit?usp=sharing")
 
 #  ***************************** MENSAJES ***************************** 
 async def handlle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -23,7 +19,11 @@ async def handlle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     quienManda = update.message.from_user.first_name
     fechaHora = str(update.message.date)
 
-    if quienManda == "Manu":
+    print(quienManda)
+    
+    # MENSAJES QUE IGNORA
+    if quienManda != "Lucas":
+        print("ignorado")
         return
 
     if text[0] == "@":
@@ -64,8 +64,7 @@ def main():
     app = Application.builder().token(keys.API_KEY).defaults(defaults).build()
 
     # Comandos
-    app.add_handler(CommandHandler("start", start_command))
-    app.add_handler(CommandHandler("ayuda", help_command))
+    app.add_handler(CommandHandler("link", link_command))
 
     # Mensajes
     app.add_handler(MessageHandler(filters.TEXT, handlle_message))
