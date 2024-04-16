@@ -1,15 +1,24 @@
 from telegram import Update
 from telegram.ext import *
 import pytz
-import datetime as dtm
+from datetime import datetime as date
 
 import Constants as keys
 import Responses as resp
-import driveExcel as drive
+import driveExcel as driveSQV
+import driveExcelTarde as driveTarde
 
 # ***************************** COMANDOS ***************************** 
-async def link_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Link: https://docs.google.com/spreadsheets/d/1gR9xNEhYWcS2XqRWDOdAi2a6AvVTaM7pHbGh49WSy8w/edit?usp=sharing")
+# async def link_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# # INTERTANDAS SQV
+#     print(update.message.chat.title)
+#     if update.message.chat.title == "CORTES SQV":
+#         await update.message.reply_text("Link: https://docs.google.com/spreadsheets/d/1gR9xNEhYWcS2XqRWDOdAi2a6AvVTaM7pHbGh49WSy8w/edit?usp=sharing")
+#         return
+
+# # INTERTANDAS TARDE
+#     await update.message.reply_text("Link: https://docs.google.com/spreadsheets/d/1HHFsjmQ8fd2lsEWZU0KJPqE2B0Ip0MaFbZl_xujLCSk/edit?usp=sharing")
+
 
 #  ***************************** MENSAJES ***************************** 
 async def handlle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -19,13 +28,18 @@ async def handlle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     quienManda = update.message.from_user.first_name
     fechaHora = str(update.message.date)
 
-    print(quienManda)
-    
+    print(quienManda+"  -   "+nombreGrupo)
+    # INTERTANDAS TARDE
+
+    aceptados = ["Lucas", "Martu", "Yamila", "Manu"]
+
     # MENSAJES QUE IGNORA
-    if quienManda != "Lucas":
+    if quienManda in aceptados:
+        print(quienManda)
+    else:
         print("ignorado")
         return
-
+    
     if text[0] == "@":
         return
 
@@ -34,7 +48,6 @@ async def handlle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Log solicitud
     print(f"SOLICITUD | Usuario: {quienManda} | Tipo de solicitud: {response.bloque} | Grupo/Pnal: {message_type} | Mensaje: {text} | Tiempo: {fechaHora}")
     
-       
     # Log respuesta
     print("Bot: ", response.mensaje)
     if response.rta:
@@ -47,9 +60,13 @@ async def handlle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response.tipo = "Bloque Entero" if response.bloque else "Corte"
     response.mensaje = text
     response.group = nombreGrupo
-    if response.drive:
-        drive.carga(response)
+    response.diaSem = date.today().strftime("%A")
 
+    if response.drive and response.group == "CORTES SQV":
+        driveSQV.carga(response)
+        return
+    
+    driveTarde.carga(response)
 
 #  ***************************** ERROR  ***************************** 
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -58,13 +75,14 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 #  ***************************** INICIALIZA BOT  ***************************** 
 def main():
+
     defaults = Defaults(tzinfo=pytz.timezone('America/Argentina/Buenos_Aires'))
 
     print("Bot inicializado...")
     app = Application.builder().token(keys.API_KEY).defaults(defaults).build()
 
     # Comandos
-    app.add_handler(CommandHandler("link", link_command))
+    # app.add_handler(CommandHandler("link", link_command))
 
     # Mensajes
     app.add_handler(MessageHandler(filters.TEXT, handlle_message))
